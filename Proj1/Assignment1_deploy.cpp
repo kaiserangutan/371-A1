@@ -2,12 +2,10 @@
 #include <iostream>
 #include <algorithm>
 #include <vector>
-
-#include <iostream>
 #include <list>
 
-//#define GLEW_STATIC 1 // This allows linking with Static Library on Windows, without DLL
-#include <GL/glew.h>  // Include GLEW - OpenGL Extension Wrangler
+// #define GLEW_STATIC 1 // This allows linking with Static Library on Windows, without DLL
+#include <GL/glew.h> // Include GLEW - OpenGL Extension Wrangler
 
 #include <GLFW/glfw3.h> // cross-platform interface for creating a graphical context,
                         // initializing OpenGL and binding inputs
@@ -19,8 +17,8 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb/stb_image.h>
 
-#include "OBJloader.h"  //For loading .obj files
-#include "OBJloaderV2.h"  //For loading .obj files using a polygon list format
+#include "OBJloader.h"   //For loading .obj files
+#include "OBJloaderV2.h" //For loading .obj files using a polygon list format
 
 using namespace glm;
 using namespace std;
@@ -64,7 +62,7 @@ const char *getTexturedVertexShaderSource();
 
 const char *getTexturedFragmentShaderSource();
 
-int compileAndLinkShaders(const char *vertexShaderSource, const char *fragmentShaderSource);
+// int compileAndLinkShaders(const char *vertexShaderSource, const char *fragmentShaderSource);
 
 GLuint loadTexture(const char *filename)
 {
@@ -111,247 +109,242 @@ GLuint loadTexture(const char *filename)
     return textureID;
 }
 
-//const char *getVertexShaderSource()
+// const char *getVertexShaderSource()
 //{
-//    // For now, you use a string for your shader code, in the assignment, shaders will be stored in .glsl files
-//    return "#version 330 core\n"
-//           "layout (location = 0) in vec3 aPos;"
-//           "layout (location = 1) in vec3 aColor;"
-//           "layout (location = 2) in vec2 aUV;"
+//     // For now, you use a string for your shader code, in the assignment, shaders will be stored in .glsl files
+//     return "#version 330 core\n"
+//            "layout (location = 0) in vec3 aPos;"
+//            "layout (location = 1) in vec3 aColor;"
+//            "layout (location = 2) in vec2 aUV;"
+//             ""
+//             "out vec3 vertexNormal;"
+//             ""
+//            "uniform mat4 worldMatrix;"
+//            "uniform mat4 viewMatrix = mat4(1.0);" // default value for view matrix (identity)
+//            "uniform mat4 projectionMatrix = mat4(1.0);"
 //            ""
-//            "out vec3 vertexNormal;"
+//            "out vec3 vertexColor;"
+//            "out vec2 vertexUV;"
 //            ""
-//           "uniform mat4 worldMatrix;"
-//           "uniform mat4 viewMatrix = mat4(1.0);" // default value for view matrix (identity)
-//           "uniform mat4 projectionMatrix = mat4(1.0);"
-//           ""
-//           "out vec3 vertexColor;"
-//           "out vec2 vertexUV;"
-//           ""
-//           "void main()"
-//           "{"
-//           "   vertexColor = aColor;"
-//           "   mat4 modelViewProjection = projectionMatrix * viewMatrix * worldMatrix;"
-//           "   gl_Position = modelViewProjection * vec4(aPos.x, aPos.y, aPos.z, 1.0);"
-//           "   vertexUV = aUV;"
-//            "    vertexNormal = mat3(transpose(inverse(worldMatrix))) * aNormal;\n"
-//           "}";
-//}
+//            "void main()"
+//            "{"
+//            "   vertexColor = aColor;"
+//            "   mat4 modelViewProjection = projectionMatrix * viewMatrix * worldMatrix;"
+//            "   gl_Position = modelViewProjection * vec4(aPos.x, aPos.y, aPos.z, 1.0);"
+//            "   vertexUV = aUV;"
+//             "    vertexNormal = mat3(transpose(inverse(worldMatrix))) * aNormal;\n"
+//            "}";
+// }
 //
-//const char *getFragmentShaderSource()
+// const char *getFragmentShaderSource()
 //{
-//    return "#version 330 core\n"
-//           "in vec3 vertexColor;"
-//           "in vec2 vertexUV;"
-//           "uniform sampler2D textureSampler;"
-//           ""
-//           "out vec4 FragColor;"
-//           "void main()"
-//           "{"
-//        "    vec3 color = normalize(vertexNormal) * 0.5 + 0.5;\n"  // map from [-1,1] to [0,1]
-//           "   vec4 textureColor = texture(textureSampler, vertexUV);"
-//           "   FragColor = textureColor;"
-//           "}";
-//}
+//     return "#version 330 core\n"
+//            "in vec3 vertexColor;"
+//            "in vec2 vertexUV;"
+//            "uniform sampler2D textureSampler;"
+//            ""
+//            "out vec4 FragColor;"
+//            "void main()"
+//            "{"
+//         "    vec3 color = normalize(vertexNormal) * 0.5 + 0.5;\n"  // map from [-1,1] to [0,1]
+//            "   vec4 textureColor = texture(textureSampler, vertexUV);"
+//            "   FragColor = textureColor;"
+//            "}";
+// }
 
-//const char* getVertexShaderSource()
+// const char* getVertexShaderSource()
 //{
-//    return "#version 330 core\n"
-//        "layout (location = 0) in vec3 aPos;\n"
-//        "layout (location = 1) in vec3 aNormal;\n"
-//        "layout (location = 2) in vec2 aUV;\n"
-//        
+//     return "#version 330 core\n"
+//         "layout (location = 0) in vec3 aPos;\n"
+//         "layout (location = 1) in vec3 aNormal;\n"
+//         "layout (location = 2) in vec2 aUV;\n"
 //
-//        "\n"
-//        "out vec3 vertexNormal;\n"
-//        "out vec2 vertexUV;\n"
-//        "\n"
-//        "uniform mat4 worldMatrix;\n"
-//        "uniform mat4 viewMatrix;\n"
-//        "uniform mat4 projectionMatrix;\n"
-//        "\n"
-//        "void main()\n"
-//        "{\n"
-//        "   vertexUV = aUV;\n"
-//        "   vertexNormal = mat3(transpose(inverse(worldMatrix))) * aNormal;\n"
-//        "   mat4 modelViewProjection = projectionMatrix * viewMatrix * worldMatrix;\n"
-//        "   gl_Position = modelViewProjection * vec4(aPos, 1.0);\n"
-//        "}";
-//}
+//
+//         "\n"
+//         "out vec3 vertexNormal;\n"
+//         "out vec2 vertexUV;\n"
+//         "\n"
+//         "uniform mat4 worldMatrix;\n"
+//         "uniform mat4 viewMatrix;\n"
+//         "uniform mat4 projectionMatrix;\n"
+//         "\n"
+//         "void main()\n"
+//         "{\n"
+//         "   vertexUV = aUV;\n"
+//         "   vertexNormal = mat3(transpose(inverse(worldMatrix))) * aNormal;\n"
+//         "   mat4 modelViewProjection = projectionMatrix * viewMatrix * worldMatrix;\n"
+//         "   gl_Position = modelViewProjection * vec4(aPos, 1.0);\n"
+//         "}";
+// }
 
-
-//const char* getFragmentShaderSource()
+// const char* getFragmentShaderSource()
 //{
-//    return "#version 330 core\n"
-//        "in vec3 vertexColor;\n"
-//        "in vec2 vertexUV;\n"
-//        "in vec3 vertexNormal;\n"
-//        "uniform sampler2D textureSampler;\n"
-//        "uniform bool useTexture;\n"
-//        "uniform vec3 objectColor;\n"
-//        "\n"
-//        "out vec4 FragColor;\n"
-//        "void main()\n"
-//        "{\n"
-//        "   if (useTexture) {\n"
-//        "       vec4 textureColor = texture(textureSampler, vertexUV);\n"
-//        "       FragColor = textureColor;\n"
-//        "   } else {\n"
-//        "       float beam = sin(vertexUV.x * 10.0);\n"
-//        "       beam = beam * 0.5 + 0.5;\n"
-//        "       FragColor = vec4(objectColor * beam, 1.0);\n"
-//        "   }\n"
-//        "}";
-//}
+//     return "#version 330 core\n"
+//         "in vec3 vertexColor;\n"
+//         "in vec2 vertexUV;\n"
+//         "in vec3 vertexNormal;\n"
+//         "uniform sampler2D textureSampler;\n"
+//         "uniform bool useTexture;\n"
+//         "uniform vec3 objectColor;\n"
+//         "\n"
+//         "out vec4 FragColor;\n"
+//         "void main()\n"
+//         "{\n"
+//         "   if (useTexture) {\n"
+//         "       vec4 textureColor = texture(textureSampler, vertexUV);\n"
+//         "       FragColor = textureColor;\n"
+//         "   } else {\n"
+//         "       float beam = sin(vertexUV.x * 10.0);\n"
+//         "       beam = beam * 0.5 + 0.5;\n"
+//         "       FragColor = vec4(objectColor * beam, 1.0);\n"
+//         "   }\n"
+//         "}";
+// }
 
-const char* getVertexShaderSource()
+const char *getVertexShaderSource()
 {
     return "#version 330 core\n"
-        "layout (location = 0) in vec3 aPos;\n"
-        "layout (location = 1) in vec3 aNormal;\n"
-        "layout (location = 2) in vec2 aUV;\n"
+           "layout (location = 0) in vec3 aPos;\n"
+           "layout (location = 1) in vec3 aNormal;\n"
+           "layout (location = 2) in vec2 aUV;\n"
 
-        "\n"
-        "out vec3 vertexNormal;\n"
-        "out vec2 vertexUV;\n"
-        "out vec3 worldPos;\n"  // Added for spotlight calculations
-        "\n"
-        "uniform mat4 worldMatrix;\n"
-        "uniform mat4 viewMatrix;\n"
-        "uniform mat4 projectionMatrix;\n"
-        "\n"
-        "void main()\n"
-        "{\n"
-        "   vertexUV = aUV;\n"
-        "   vertexNormal = mat3(transpose(inverse(worldMatrix))) * aNormal;\n"
-        "   worldPos = vec3(worldMatrix * vec4(aPos, 1.0));\n"  // Added world position
-        "   mat4 modelViewProjection = projectionMatrix * viewMatrix * worldMatrix;\n"
-        "   gl_Position = modelViewProjection * vec4(aPos, 1.0);\n"
-        "}";
+           "\n"
+           "out vec3 vertexNormal;\n"
+           "out vec2 vertexUV;\n"
+           "out vec3 worldPos;\n" // Added for spotlight calculations
+           "\n"
+           "uniform mat4 worldMatrix;\n"
+           "uniform mat4 viewMatrix;\n"
+           "uniform mat4 projectionMatrix;\n"
+           "\n"
+           "void main()\n"
+           "{\n"
+           "   vertexUV = aUV;\n"
+           "   vertexNormal = mat3(transpose(inverse(worldMatrix))) * aNormal;\n"
+           "   worldPos = vec3(worldMatrix * vec4(aPos, 1.0));\n" // Added world position
+           "   mat4 modelViewProjection = projectionMatrix * viewMatrix * worldMatrix;\n"
+           "   gl_Position = modelViewProjection * vec4(aPos, 1.0);\n"
+           "}";
 }
-//WORKING SPOTLIGHT
-//const char* getFragmentShaderSource()
+// WORKING SPOTLIGHT
+// const char* getFragmentShaderSource()
 //{
-//    return "#version 330 core\n"
-//        "in vec3 vertexColor;\n"
-//        "in vec2 vertexUV;\n"
-//        "in vec3 vertexNormal;\n"
-//        "in vec3 worldPos;\n"  // Added for spotlight calculations
+//     return "#version 330 core\n"
+//         "in vec3 vertexColor;\n"
+//         "in vec2 vertexUV;\n"
+//         "in vec3 vertexNormal;\n"
+//         "in vec3 worldPos;\n"  // Added for spotlight calculations
 //
-//        "uniform sampler2D textureSampler;\n"
-//        "uniform bool useTexture;\n"
-//        "uniform vec3 objectColor;\n"
+//         "uniform sampler2D textureSampler;\n"
+//         "uniform bool useTexture;\n"
+//         "uniform vec3 objectColor;\n"
 //
-//        // Spotlight uniforms
-//        "uniform vec3 spotlightPos;\n"
-//        "uniform vec3 spotlightDir;\n"
-//        "uniform float spotlightCutoff;\n"
-//        "uniform float spotlightOuterCutoff;\n"
-//        "uniform vec3 spotlightColor;\n"
-//        "uniform float spotlightIntensity;\n"
+//         // Spotlight uniforms
+//         "uniform vec3 spotlightPos;\n"
+//         "uniform vec3 spotlightDir;\n"
+//         "uniform float spotlightCutoff;\n"
+//         "uniform float spotlightOuterCutoff;\n"
+//         "uniform vec3 spotlightColor;\n"
+//         "uniform float spotlightIntensity;\n"
 //
-//        "\n"
-//        "out vec4 FragColor;\n"
+//         "\n"
+//         "out vec4 FragColor;\n"
 //
-//        "float calculateSpotlight(vec3 lightPos, vec3 lightDir, float cutoff, float outerCutoff, vec3 fragPos)\n"
-//        "{\n"
-//        "    vec3 lightToFrag = normalize(fragPos - lightPos);\n"
-//        "    float theta = dot(lightToFrag, normalize(lightDir));\n"
-//        "    float epsilon = cutoff - outerCutoff;\n"
-//        "    float intensity = clamp((theta - outerCutoff) / epsilon, 0.0, 1.0);\n"
-//        "    return intensity;\n"
-//        "}\n"
+//         "float calculateSpotlight(vec3 lightPos, vec3 lightDir, float cutoff, float outerCutoff, vec3 fragPos)\n"
+//         "{\n"
+//         "    vec3 lightToFrag = normalize(fragPos - lightPos);\n"
+//         "    float theta = dot(lightToFrag, normalize(lightDir));\n"
+//         "    float epsilon = cutoff - outerCutoff;\n"
+//         "    float intensity = clamp((theta - outerCutoff) / epsilon, 0.0, 1.0);\n"
+//         "    return intensity;\n"
+//         "}\n"
 //
-//        "void main()\n"
-//        "{\n"
-//        "   // Calculate spotlight intensity\n"
-//        "   float spotIntensity = calculateSpotlight(spotlightPos, spotlightDir, spotlightCutoff, spotlightOuterCutoff, worldPos);\n"
-//        "   \n"
-//        "   // Calculate basic lighting (optional - adds nice depth)\n"
-//        "   vec3 normal = normalize(vertexNormal);\n"
-//        "   vec3 lightDirection = normalize(spotlightPos - worldPos);\n"
-//        "   float diffuse = max(dot(normal, lightDirection), 0.0);\n"
-//        "   \n"
-//        "   // Combine spotlight with diffuse lighting\n"
-//        "   float lightFactor = spotIntensity * diffuse * spotlightIntensity;\n"
-//        "   vec3 lightContribution = spotlightColor * lightFactor;\n"
-//        "   \n"
-//        "   if (useTexture) {\n"
-//        "       vec4 textureColor = texture(textureSampler, vertexUV);\n"
-//        "       // Apply spotlight to texture (keeping original 0.2 base + spotlight)\n"
-//        "       FragColor = textureColor * (0.4 + lightContribution.r);\n"
-//        "   } else {\n"
-//        "       float beam = sin(vertexUV.x * 10.0);\n"
-//        "       beam = beam * 0.5 + 0.5;\n"
-//        "       // Apply spotlight to procedural color (keeping original beam effect)\n"
-//        "       vec3 finalColor = objectColor * beam * (0.5 + lightContribution);\n"
-//        "       FragColor = vec4(finalColor, 1.0)*1.5;\n"
-//        "   }\n"
-//        "}";
-//}
+//         "void main()\n"
+//         "{\n"
+//         "   // Calculate spotlight intensity\n"
+//         "   float spotIntensity = calculateSpotlight(spotlightPos, spotlightDir, spotlightCutoff, spotlightOuterCutoff, worldPos);\n"
+//         "   \n"
+//         "   // Calculate basic lighting (optional - adds nice depth)\n"
+//         "   vec3 normal = normalize(vertexNormal);\n"
+//         "   vec3 lightDirection = normalize(spotlightPos - worldPos);\n"
+//         "   float diffuse = max(dot(normal, lightDirection), 0.0);\n"
+//         "   \n"
+//         "   // Combine spotlight with diffuse lighting\n"
+//         "   float lightFactor = spotIntensity * diffuse * spotlightIntensity;\n"
+//         "   vec3 lightContribution = spotlightColor * lightFactor;\n"
+//         "   \n"
+//         "   if (useTexture) {\n"
+//         "       vec4 textureColor = texture(textureSampler, vertexUV);\n"
+//         "       // Apply spotlight to texture (keeping original 0.2 base + spotlight)\n"
+//         "       FragColor = textureColor * (0.4 + lightContribution.r);\n"
+//         "   } else {\n"
+//         "       float beam = sin(vertexUV.x * 10.0);\n"
+//         "       beam = beam * 0.5 + 0.5;\n"
+//         "       // Apply spotlight to procedural color (keeping original beam effect)\n"
+//         "       vec3 finalColor = objectColor * beam * (0.5 + lightContribution);\n"
+//         "       FragColor = vec4(finalColor, 1.0)*1.5;\n"
+//         "   }\n"
+//         "}";
+// }
 
-const char* getFragmentShaderSource()
+const char *getFragmentShaderSource()
 {
     return "#version 330 core\n"
-        "in vec3 vertexColor;\n"
-        "in vec2 vertexUV;\n"
-        "in vec3 vertexNormal;\n"
-        "in vec3 worldPos;\n"
-        "uniform sampler2D textureSampler;\n"
-        "uniform bool useTexture;\n"
-        "uniform vec3 objectColor;\n"
-        "uniform vec3 spotlightPos[3];\n"                                    // Multiple spotlight uniforms - using explicit array size
-        "uniform vec3 spotlightDir[3];\n"
-        "uniform float spotlightCutoff[3];\n"
-        "uniform float spotlightOuterCutoff[3];\n"
-        "uniform vec3 spotlightColor[3];\n"
-        "uniform float spotlightIntensity[3];\n"
-        "\n"
-        "out vec4 FragColor;\n"
-        "float calculateSpotlight(vec3 lightPos, vec3 lightDir, float cutoff, float outerCutoff, vec3 fragPos)\n"
-        "{\n"
-        "    vec3 lightToFrag = normalize(fragPos - lightPos);\n"
-        "    float theta = dot(lightToFrag, normalize(lightDir));\n"
-        "    float epsilon = cutoff - outerCutoff;\n"
-        "    float intensity = clamp((theta - outerCutoff) / epsilon, 0.0, 1.0);\n"
-        "    return intensity;\n"
-        "}\n"
-        "void main()\n"
-        "{\n"
-        "   vec3 totalLightContribution = vec3(0.0);\n"                      // Calculate combined lighting from all 3 spotlights
-        "   \n"
-        "   for(int i = 0; i < 3; i++) {\n"                                 // Process each spotlight individually (unrolled loop for better compatibility)
-        "       float spotIntensity = calculateSpotlight(spotlightPos[i], spotlightDir[i], spotlightCutoff[i], spotlightOuterCutoff[i], worldPos);\n"
-        "       \n"
-        "       vec3 normal = normalize(vertexNormal);\n"
-        "       vec3 lightDirection = normalize(spotlightPos[i] - worldPos);\n"
-        "       float diffuse = max(dot(normal, lightDirection), 0.0);\n"
-        "       \n"
-        "       float lightFactor = spotIntensity * diffuse * spotlightIntensity[i];\n"
-        "       totalLightContribution += spotlightColor[i] * lightFactor;\n"
-        "   }\n"
-        "   \n"
-        "   vec3 ambient = vec3(0.4);\n"                                     // Higher ambient lighting so models are always visible
-        "   \n"
-        "   if (useTexture) {\n"
-        "       vec4 textureColor = texture(textureSampler, vertexUV);\n"
-        "       FragColor = textureColor * vec4(ambient + totalLightContribution, 1.0);\n"
-        "   } else {\n"
-        "       float beam = sin(vertexUV.x * 10.0);\n"                      // Enhanced beam effect with better base color
-        "       beam = beam * 0.5 + 0.5;\n"
-        "       \n"
-        "       vec3 baseColor = max(objectColor, vec3(0.6)) * 2.3;\n"       // Boost the objectColor to make it more visible and add beam multiplier
-        "       vec3 beamColor = baseColor * (beam * 0.7 + 0.8);\n"         // Ensure minimum brightness
-        "       vec3 finalColor = beamColor * (ambient + totalLightContribution * 1.2);\n"  // Beam effect with higher base
-        "       \n"
-        "       FragColor = vec4(finalColor, 1.0);\n"
-        "   }\n"
-        "}";
+           "in vec3 vertexColor;\n"
+           "in vec2 vertexUV;\n"
+           "in vec3 vertexNormal;\n"
+           "in vec3 worldPos;\n"
+           "uniform sampler2D textureSampler;\n"
+           "uniform bool useTexture;\n"
+           "uniform vec3 objectColor;\n"
+           "uniform vec3 spotlightPos[3];\n" // Multiple spotlight uniforms - using explicit array size
+           "uniform vec3 spotlightDir[3];\n"
+           "uniform float spotlightCutoff[3];\n"
+           "uniform float spotlightOuterCutoff[3];\n"
+           "uniform vec3 spotlightColor[3];\n"
+           "uniform float spotlightIntensity[3];\n"
+           "\n"
+           "out vec4 FragColor;\n"
+           "float calculateSpotlight(vec3 lightPos, vec3 lightDir, float cutoff, float outerCutoff, vec3 fragPos)\n"
+           "{\n"
+           "    vec3 lightToFrag = normalize(fragPos - lightPos);\n"
+           "    float theta = dot(lightToFrag, normalize(lightDir));\n"
+           "    float epsilon = cutoff - outerCutoff;\n"
+           "    float intensity = clamp((theta - outerCutoff) / epsilon, 0.0, 1.0);\n"
+           "    return intensity;\n"
+           "}\n"
+           "void main()\n"
+           "{\n"
+           "   vec3 totalLightContribution = vec3(0.0);\n" // Calculate combined lighting from all 3 spotlights
+           "   \n"
+           "   for(int i = 0; i < 3; i++) {\n" // Process each spotlight individually (unrolled loop for better compatibility)
+           "       float spotIntensity = calculateSpotlight(spotlightPos[i], spotlightDir[i], spotlightCutoff[i], spotlightOuterCutoff[i], worldPos);\n"
+           "       \n"
+           "       vec3 normal = normalize(vertexNormal);\n"
+           "       vec3 lightDirection = normalize(spotlightPos[i] - worldPos);\n"
+           "       float diffuse = max(dot(normal, lightDirection), 0.0);\n"
+           "       \n"
+           "       float lightFactor = spotIntensity * diffuse * spotlightIntensity[i];\n"
+           "       totalLightContribution += spotlightColor[i] * lightFactor;\n"
+           "   }\n"
+           "   \n"
+           "   vec3 ambient = vec3(0.4);\n" // Higher ambient lighting so models are always visible
+           "   \n"
+           "   if (useTexture) {\n"
+           "       vec4 textureColor = texture(textureSampler, vertexUV);\n"
+           "       FragColor = textureColor * vec4(ambient + totalLightContribution, 1.0);\n"
+           "   } else {\n"
+           "       float beam = sin(vertexUV.x * 10.0);\n" // Enhanced beam effect with better base color
+           "       beam = beam * 0.5 + 0.5;\n"
+           "       \n"
+           "       vec3 baseColor = max(objectColor, vec3(0.6)) * 2.3;\n"                     // Boost the objectColor to make it more visible and add beam multiplier
+           "       vec3 beamColor = baseColor * (beam * 0.7 + 0.8);\n"                        // Ensure minimum brightness
+           "       vec3 finalColor = beamColor * (ambient + totalLightContribution * 1.2);\n" // Beam effect with higher base
+           "       \n"
+           "       FragColor = vec4(finalColor, 1.0);\n"
+           "   }\n"
+           "}";
 }
-
-
-
-
 
 const char *getTexturedVertexShaderSource()
 {
@@ -363,62 +356,138 @@ const char *getTexturedFragmentShaderSource()
     return getFragmentShaderSource(); // TODO: Replace this with the actual textured fragment shader
 }
 
-int compileAndLinkShaders(const char *vertexShaderSource, const char *fragmentShaderSource)
+GLuint compileAndLinkShaders(const char *vertexShaderSource, const char *fragmentShaderSource)
 {
-    // compile and link shader program
-    // return shader program id
-    // ------------------------------------
+    // 1. Create the shaders
+    GLuint vertexShaderID = glCreateShader(GL_VERTEX_SHADER);
+    GLuint fragmentShaderID = glCreateShader(GL_FRAGMENT_SHADER);
 
-    // vertex shader
-    int vertexShader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-    glCompileShader(vertexShader);
+    // std::cout << "DEBUG: Compiling vertex shader..." << std::endl;
+    glShaderSource(vertexShaderID, 1, &vertexShaderSource, NULL);
+    glCompileShader(vertexShaderID);
 
-    // check for shader compile errors
-    int success;
-    char infoLog[512];
-    glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-    if (!success)
+    // Check vertex shader for compilation errors
+    GLint success = 0;
+    glGetShaderiv(vertexShaderID, GL_COMPILE_STATUS, &success);
+    if (success == GL_FALSE)
     {
-        glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-        std::cerr << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n"
-                  << infoLog << std::endl;
+        GLint infoLogLength = 0;
+        glGetShaderiv(vertexShaderID, GL_INFO_LOG_LENGTH, &infoLogLength);
+        std::vector<char> vertexShaderErrorMessage(infoLogLength);
+        glGetShaderInfoLog(vertexShaderID, infoLogLength, NULL, &vertexShaderErrorMessage[0]);
+        // std::cerr << "Vertex shader compilation failed:\n" << &vertexShaderErrorMessage[0] << std::endl;
+        glDeleteShader(vertexShaderID);
+        glDeleteShader(fragmentShaderID);
+        return 0;
+    }
+    // std::cout << "DEBUG: Vertex shader compiled successfully." << std::endl;
+
+    // std::cout << "DEBUG: Compiling fragment shader..." << std::endl;
+    glShaderSource(fragmentShaderID, 1, &fragmentShaderSource, NULL);
+    glCompileShader(fragmentShaderID);
+
+    // Check fragment shader for compilation errors
+    success = 0;
+    glGetShaderiv(fragmentShaderID, GL_COMPILE_STATUS, &success);
+    if (success == GL_FALSE)
+    {
+        GLint infoLogLength = 0;
+        glGetShaderiv(fragmentShaderID, GL_INFO_LOG_LENGTH, &infoLogLength);
+        std::vector<char> fragmentShaderErrorMessage(infoLogLength);
+        glGetShaderInfoLog(fragmentShaderID, infoLogLength, NULL, &fragmentShaderErrorMessage[0]);
+        // std::cerr << "Fragment shader compilation failed:\n" << &fragmentShaderErrorMessage[0] << std::endl;
+        glDeleteShader(vertexShaderID);
+        glDeleteShader(fragmentShaderID);
+        return 0;
+    }
+    // std::cout << "DEBUG: Fragment shader compiled successfully." << std::endl;
+
+    // 2. Link the program
+    // std::cout << "DEBUG: Linking program..." << std::endl;
+    GLuint programID = glCreateProgram();
+    glAttachShader(programID, vertexShaderID);
+    glAttachShader(programID, fragmentShaderID);
+    glLinkProgram(programID);
+
+    // Check for linking errors
+    success = 0;
+    glGetProgramiv(programID, GL_LINK_STATUS, &success);
+    if (success == GL_FALSE)
+    {
+        GLint infoLogLength = 0;
+        glGetProgramiv(programID, GL_INFO_LOG_LENGTH, &infoLogLength);
+        std::vector<char> programErrorMessage(infoLogLength);
+        glGetProgramInfoLog(programID, infoLogLength, NULL, &programErrorMessage[0]);
+        // std::cerr << "Shader program linking failed:\n" << &programErrorMessage[0] << std::endl;
+        glDeleteProgram(programID);
+        return 0;
     }
 
-    // fragment shader
-    int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-    glCompileShader(fragmentShader);
+    // 3. Clean up and return
+    glDetachShader(programID, vertexShaderID);
+    glDetachShader(programID, fragmentShaderID);
+    glDeleteShader(vertexShaderID);
+    glDeleteShader(fragmentShaderID);
 
-    // check for shader compile errors
-    glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
-    if (!success)
-    {
-        glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-        std::cerr << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n"
-                  << infoLog << std::endl;
-    }
-
-    // link shaders
-    int shaderProgram = glCreateProgram();
-    glAttachShader(shaderProgram, vertexShader);
-    glAttachShader(shaderProgram, fragmentShader);
-    glLinkProgram(shaderProgram);
-
-    // check for linking errors
-    glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-    if (!success)
-    {
-        glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
-        std::cerr << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n"
-                  << infoLog << std::endl;
-    }
-
-    glDeleteShader(vertexShader);
-    glDeleteShader(fragmentShader);
-
-    return shaderProgram;
+    return programID;
 }
+
+// int compileAndLinkShaders(const char *vertexShaderSource, const char *fragmentShaderSource)
+// {
+//     // compile and link shader program
+//     // return shader program id
+//     // ------------------------------------
+
+//     // vertex shader
+//     int vertexShader = glCreateShader(GL_VERTEX_SHADER);
+//     glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
+//     glCompileShader(vertexShader);
+
+//     // check for shader compile errors
+//     int success;
+//     char infoLog[512];
+//     glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
+//     if (!success)
+//     {
+//         glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
+//         std::cerr << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n"
+//                   << infoLog << std::endl;
+//     }
+
+//     // fragment shader
+//     int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+//     glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
+//     glCompileShader(fragmentShader);
+
+//     // check for shader compile errors
+//     glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
+//     if (!success)
+//     {
+//         glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
+//         std::cerr << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n"
+//                   << infoLog << std::endl;
+//     }
+
+//     // link shaders
+//     int shaderProgram = glCreateProgram();
+//     glAttachShader(shaderProgram, vertexShader);
+//     glAttachShader(shaderProgram, fragmentShader);
+//     glLinkProgram(shaderProgram);
+
+//     // check for linking errors
+//     glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
+//     if (!success)
+//     {
+//         glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
+//         std::cerr << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n"
+//                   << infoLog << std::endl;
+//     }
+
+//     glDeleteShader(vertexShader);
+//     glDeleteShader(fragmentShader);
+
+//     return shaderProgram;
+// }
 
 void setProjectionMatrix(int shaderProgram, mat4 projectionMatrix)
 {
@@ -440,11 +509,13 @@ void setWorldMatrix(int shaderProgram, mat4 worldMatrix)
     GLuint worldMatrixLocation = glGetUniformLocation(shaderProgram, "worldMatrix");
     glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
 }
-//Spotlight Track multiple objects 
-void setMultipleSpotlightUniforms(int program, vec3 lightPositions[3], vec3 lightDirections[3], vec3 lightColors[3], float intensities[3]) {
+// Spotlight Track multiple objects
+void setMultipleSpotlightUniforms(int program, vec3 lightPositions[3], vec3 lightDirections[3], vec3 lightColors[3], float intensities[3])
+{
     glUseProgram(program);
 
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < 3; i++)
+    {
         string posName = "spotlightPos[" + to_string(i) + "]";
         string dirName = "spotlightDir[" + to_string(i) + "]";
         string colorName = "spotlightColor[" + to_string(i) + "]";
@@ -459,35 +530,43 @@ void setMultipleSpotlightUniforms(int program, vec3 lightPositions[3], vec3 ligh
         GLint cutoffLoc = glGetUniformLocation(program, cutoffName.c_str());
         GLint outerCutoffLoc = glGetUniformLocation(program, outerCutoffName.c_str());
 
-        if (posLoc >= 0) glUniform3fv(posLoc, 1, &lightPositions[i][0]);
-        if (dirLoc >= 0) glUniform3fv(dirLoc, 1, &lightDirections[i][0]);
-        if (colorLoc >= 0) glUniform3fv(colorLoc, 1, &lightColors[i][0]);
-        if (intensityLoc >= 0) glUniform1f(intensityLoc, intensities[i]);
+        if (posLoc >= 0)
+            glUniform3fv(posLoc, 1, &lightPositions[i][0]);
+        if (dirLoc >= 0)
+            glUniform3fv(dirLoc, 1, &lightDirections[i][0]);
+        if (colorLoc >= 0)
+            glUniform3fv(colorLoc, 1, &lightColors[i][0]);
+        if (intensityLoc >= 0)
+            glUniform1f(intensityLoc, intensities[i]);
 
         // Adjust these angles to make lights cover more area
         float innerCutoff, outerCutoff;
 
-        if (i == 0) {
+        if (i == 0)
+        {
             // Main center light - very wide coverage
-            innerCutoff = cos(radians(8.0f));  
-            outerCutoff = cos(radians(12.0f));  
+            innerCutoff = cos(radians(8.0f));
+            outerCutoff = cos(radians(12.0f));
         }
-        else {
+        else
+        {
             // Orbiting lights - medium wide coverage
-            innerCutoff = cos(radians(5.0f));  
-            outerCutoff = cos(radians(8.0f));  
+            innerCutoff = cos(radians(5.0f));
+            outerCutoff = cos(radians(8.0f));
         }
 
-        if (cutoffLoc >= 0) glUniform1f(cutoffLoc, innerCutoff);
-        if (outerCutoffLoc >= 0) glUniform1f(outerCutoffLoc, outerCutoff);
+        if (cutoffLoc >= 0)
+            glUniform1f(cutoffLoc, innerCutoff);
+        if (outerCutoffLoc >= 0)
+            glUniform1f(outerCutoffLoc, outerCutoff);
     }
 }
-
 
 struct TexturedColoredVertex
 {
     TexturedColoredVertex(vec3 _position, vec3 _normal, vec2 _uv)
-        : position(_position), normal(_normal), uv(_uv) {
+        : position(_position), normal(_normal), uv(_uv)
+    {
     }
 
     vec3 position;
@@ -495,41 +574,42 @@ struct TexturedColoredVertex
     vec2 uv;
 };
 
-GLuint setupModelVBO(string path, int& vertexCount) {
+GLuint setupModelVBO(string path, int &vertexCount)
+{
     std::vector<glm::vec3> vertices;
     std::vector<glm::vec3> normals;
     std::vector<glm::vec2> UVs;
 
-    //read the vertex data from the model's OBJ file
+    // read the vertex data from the model's OBJ file
     loadOBJ(path.c_str(), vertices, normals, UVs);
 
     GLuint VAO;
     glGenVertexArrays(1, &VAO);
-    glBindVertexArray(VAO); //Becomes active VAO
+    glBindVertexArray(VAO); // Becomes active VAO
     // Bind the Vertex Array Object first, then bind and set vertex buffer(s) and attribute pointer(s).
 
-    //Vertex VBO setup
+    // Vertex VBO setup
     GLuint vertices_VBO;
     glGenBuffers(1, &vertices_VBO);
     glBindBuffer(GL_ARRAY_BUFFER, vertices_VBO);
     glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3), &vertices.front(), GL_STATIC_DRAW);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid *)0);
     glEnableVertexAttribArray(0);
 
-    //Normals VBO setup
+    // Normals VBO setup
     GLuint normals_VBO;
     glGenBuffers(1, &normals_VBO);
     glBindBuffer(GL_ARRAY_BUFFER, normals_VBO);
     glBufferData(GL_ARRAY_BUFFER, normals.size() * sizeof(glm::vec3), &normals.front(), GL_STATIC_DRAW);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid *)0);
     glEnableVertexAttribArray(1);
 
-    //UVs VBO setup
+    // UVs VBO setup
     GLuint uvs_VBO;
     glGenBuffers(1, &uvs_VBO);
     glBindBuffer(GL_ARRAY_BUFFER, uvs_VBO);
     glBufferData(GL_ARRAY_BUFFER, UVs.size() * sizeof(glm::vec2), &UVs.front(), GL_STATIC_DRAW);
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), (GLvoid*)0);
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), (GLvoid *)0);
     glEnableVertexAttribArray(2);
 
     glBindVertexArray(0); // Unbind VAO (it's always a good thing to unbind any buffer/array to prevent strange bugs, as we are using multiple VAOs)
@@ -537,49 +617,48 @@ GLuint setupModelVBO(string path, int& vertexCount) {
     return VAO;
 }
 
-
-//Sets up a model using an Element Buffer Object to refer to vertex data
-GLuint setupModelEBO(string path, int& vertexCount)
+// Sets up a model using an Element Buffer Object to refer to vertex data
+GLuint setupModelEBO(string path, int &vertexCount)
 {
-    vector<int> vertexIndices; //The contiguous sets of three indices of vertices, normals and UVs, used to make a triangle
+    vector<int> vertexIndices; // The contiguous sets of three indices of vertices, normals and UVs, used to make a triangle
     vector<glm::vec3> vertices;
     vector<glm::vec3> normals;
     vector<glm::vec2> UVs;
 
-    //read the vertices from the cube.obj file
-    //We won't be needing the normals or UVs for this program
+    // read the vertices from the cube.obj file
+    // We won't be needing the normals or UVs for this program
     loadOBJ2(path.c_str(), vertexIndices, vertices, normals, UVs);
 
     GLuint VAO;
     glGenVertexArrays(1, &VAO);
-    glBindVertexArray(VAO); //Becomes active VAO
+    glBindVertexArray(VAO); // Becomes active VAO
     // Bind the Vertex Array Object first, then bind and set vertex buffer(s) and attribute pointer(s).
 
-    //Vertex VBO setup
+    // Vertex VBO setup
     GLuint vertices_VBO;
     glGenBuffers(1, &vertices_VBO);
     glBindBuffer(GL_ARRAY_BUFFER, vertices_VBO);
     glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3), &vertices.front(), GL_STATIC_DRAW);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid *)0);
     glEnableVertexAttribArray(0);
 
-    //Normals VBO setup
+    // Normals VBO setup
     GLuint normals_VBO;
     glGenBuffers(1, &normals_VBO);
     glBindBuffer(GL_ARRAY_BUFFER, normals_VBO);
     glBufferData(GL_ARRAY_BUFFER, normals.size() * sizeof(glm::vec3), &normals.front(), GL_STATIC_DRAW);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid *)0);
     glEnableVertexAttribArray(1);
 
-    //UVs VBO setup
+    // UVs VBO setup
     GLuint uvs_VBO;
     glGenBuffers(1, &uvs_VBO);
     glBindBuffer(GL_ARRAY_BUFFER, uvs_VBO);
     glBufferData(GL_ARRAY_BUFFER, UVs.size() * sizeof(glm::vec2), &UVs.front(), GL_STATIC_DRAW);
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), (GLvoid*)0);
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), (GLvoid *)0);
     glEnableVertexAttribArray(2);
 
-    //EBO setup
+    // EBO setup
     GLuint EBO;
     glGenBuffers(1, &EBO);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
@@ -589,7 +668,6 @@ GLuint setupModelEBO(string path, int& vertexCount)
     vertexCount = vertexIndices.size();
     return VAO;
 }
-
 
 const TexturedColoredVertex texturedPrism2VertexArray[] = {
     // left face - red
@@ -930,11 +1008,7 @@ glm::vec3 tetraVertexArray[] = {
     {1.f, 1.f, 0.f},
 };
 
-
-
-
-
-int createTexturedVertexArrayObject(const TexturedColoredVertex* vertexArray, int arraySize)
+int createTexturedVertexArrayObject(const TexturedColoredVertex *vertexArray, int arraySize)
 {
     // Create a vertex array
     GLuint vertexArrayObject;
@@ -945,48 +1019,44 @@ int createTexturedVertexArrayObject(const TexturedColoredVertex* vertexArray, in
     GLuint vertexBufferObject;
     glGenBuffers(1, &vertexBufferObject);
     glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject);
-    glBufferData(GL_ARRAY_BUFFER, arraySize * sizeof(TexturedColoredVertex), vertexArray, GL_STATIC_DRAW);
-
-    glVertexAttribPointer(0,                     // attribute 0 matches aPos in Vertex Shader
-        3,                     // size
-        GL_FLOAT,              // type
-        GL_FALSE,              // normalized?
-        sizeof(TexturedColoredVertex), // stride
-        (void*)offsetof(TexturedColoredVertex, position)              // array buffer offset
+    glBufferData(GL_ARRAY_BUFFER, arraySize, vertexArray, GL_STATIC_DRAW);
+    glVertexAttribPointer(0,                                                // attribute 0 matches aPos in Vertex Shader
+                          3,                                                // size
+                          GL_FLOAT,                                         // type
+                          GL_FALSE,                                         // normalized?
+                          sizeof(TexturedColoredVertex),                    // stride
+                          (void *)offsetof(TexturedColoredVertex, position) // array buffer offset
     );
     glEnableVertexAttribArray(0);
 
     glVertexAttribPointer(1, // attribute 1 matches aNormal in Vertex Shader
-        3,
-        GL_FLOAT,
-        GL_FALSE,
-        sizeof(TexturedColoredVertex),
-        (void*)offsetof(TexturedColoredVertex, normal)
-    );
+                          3,
+                          GL_FLOAT,
+                          GL_FALSE,
+                          sizeof(TexturedColoredVertex),
+                          (void *)offsetof(TexturedColoredVertex, normal));
     glEnableVertexAttribArray(1);
 
     glVertexAttribPointer(2, // attribute 2 matches aUV in Vertex Shader
-        2,
-        GL_FLOAT,
-        GL_FALSE,
-        sizeof(TexturedColoredVertex),
-        (void*)offsetof(TexturedColoredVertex, uv)
-    );
+                          2,
+                          GL_FLOAT,
+                          GL_FALSE,
+                          sizeof(TexturedColoredVertex),
+                          (void *)offsetof(TexturedColoredVertex, uv));
     glEnableVertexAttribArray(2);
 
     return vertexArrayObject;
 }
 
 GLfloat lightVertices[] = {
-    -0.1f, -0.1f,  0.1f,
+    -0.1f, -0.1f, 0.1f,
     -0.1f, -0.1f, -0.1f,
-     0.1f, -0.1f, -0.1f,
-     0.1f, -0.1f,  0.1f,
-    -0.1f,  0.1f,  0.1f,
-    -0.1f,  0.1f, -0.1f,
-     0.1f,  0.1f, -0.1f,
-     0.1f,  0.1f,  0.1f
-};
+    0.1f, -0.1f, -0.1f,
+    0.1f, -0.1f, 0.1f,
+    -0.1f, 0.1f, 0.1f,
+    -0.1f, 0.1f, -0.1f,
+    0.1f, 0.1f, -0.1f,
+    0.1f, 0.1f, 0.1f};
 
 GLuint lightIndices[] = {
     0, 1, 2,
@@ -1000,8 +1070,7 @@ GLuint lightIndices[] = {
     1, 5, 4,
     1, 4, 0,
     4, 5, 6,
-    4, 6, 7
-};
+    4, 6, 7};
 int createVertexArrayObject(const glm::vec3 *vertexArray, int arraySize)
 {
     // Create a vertex array
@@ -1039,8 +1108,8 @@ int createVertexArrayObject(const glm::vec3 *vertexArray, int arraySize)
     return vertexArrayObject;
 }
 
-
-class Light {
+class Light
+{
 public:
     vec3 position;
 
@@ -1049,8 +1118,13 @@ public:
 
 int main(int argc, char *argv[])
 {
+
     // Initialize GLFW and OpenGL version
-    glfwInit();
+    if (!glfwInit())
+    {
+        std::cerr << "Failed to initialize GLFW" << std::endl;
+        return -1;
+    }
 
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
@@ -1058,7 +1132,7 @@ int main(int argc, char *argv[])
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
     // Create Window and rendering context using GLFW, resolution is 800x600
-    GLFWwindow *window = glfwCreateWindow(800, 600, "Comp371 - Project 1", NULL, NULL);
+    GLFWwindow *window = glfwCreateWindow(800, 600, "Comp371 - Project 2", NULL, NULL);
     if (window == NULL)
     {
         std::cerr << "Failed to create GLFW window" << std::endl;
@@ -1068,7 +1142,6 @@ int main(int argc, char *argv[])
     glfwMakeContextCurrent(window);
 
     // @TODO 3 - Disable mouse cursor
-    // ...
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     // Initialize GLEW
@@ -1097,23 +1170,17 @@ int main(int argc, char *argv[])
     int colorShaderProgram = compileAndLinkShaders(getVertexShaderSource(), getFragmentShaderSource());
     int texturedShaderProgram = compileAndLinkShaders(getTexturedVertexShaderSource(), getTexturedFragmentShaderSource());
 
-    //int lightShaderProgram = compileAndLinkShaders(getLightVertexShaderSource(), getLightFragmentShaderSource());
+    // int lightShaderProgram = compileAndLinkShaders(getLightVertexShaderSource(), getLightFragmentShaderSource());
 
-
-
-    //Setup models
+    // Setup models
     string cubePath = "Models/cube.obj";
 
-    //Load models as EBOs
+    // Load models as EBOs
     int cubeVertices;
     GLuint cubeVAO = setupModelEBO(cubePath, cubeVertices);
 
     int activeVAOVertices = cubeVertices;
     GLuint activeVAO = cubeVAO;
-
-
-    // We can set the shader once, since we have only one
-    //glUseProgram(shaderProgram);
 
     // Camera parameters for view transform
     vec3 cameraPosition(0.6f, 1.0f, 10.0f);
@@ -1130,6 +1197,8 @@ int main(int argc, char *argv[])
 
     // Spinning cube at camera position
     float spinningCubeAngle = 0.0f;
+
+    glUseProgram(shaderProgram);
 
     // Set projection matrix for shader, this won't change
     mat4 projectionMatrix = glm::perspective(90.0f,           // field of view in degrees
@@ -1151,11 +1220,8 @@ int main(int argc, char *argv[])
     setViewMatrix(colorShaderProgram, viewMatrix);
     setViewMatrix(texturedShaderProgram, viewMatrix);
 
-
     setProjectionMatrix(colorShaderProgram, projectionMatrix);
     setProjectionMatrix(texturedShaderProgram, projectionMatrix);
-
-    
 
     // Define and upload geometry to the GPU here ...
     int texturedPyramidVAO = createTexturedVertexArrayObject(texturedPyramidVertexArray, sizeof(texturedPyramidVertexArray));
@@ -1174,17 +1240,11 @@ int main(int argc, char *argv[])
     glBindBuffer(GL_ARRAY_BUFFER, lightVBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(lightVertices), lightVertices, GL_STATIC_DRAW);
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
     glEnableVertexAttribArray(0);
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, lightEBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(lightIndices), lightIndices, GL_STATIC_DRAW);
-
-    // Define and upload geometry to the GPU here ...
-    //int vaoCube = createVertexArrayObject(prism1VertexArray, sizeof(prism1VertexArray));
-    // int vaoPrism = createVertexArrayObject(prism2VertexArray, sizeof(prism2VertexArray));
-    // int vaoPyramid = createVertexArrayObject(pyramidVertexArray, sizeof(pyramidVertexArray));
-    // int vaoTetra = createVertexArrayObject(tetraVertexArray, sizeof(tetraVertexArray));
 
     // For frame time
     float lastFrameTime = glfwGetTime();
@@ -1197,7 +1257,7 @@ int main(int argc, char *argv[])
     glEnable(GL_CULL_FACE);
 
     // @TODO 1 - Enable Depth Test
-    // ...
+    glEnable(GL_DEPTH_TEST);
 
     // Container for projectiles to be implemented in tutorial
     list<Projectile> projectileList;
@@ -1208,11 +1268,10 @@ int main(int argc, char *argv[])
         // Frame time calculation
         float dt = glfwGetTime() - lastFrameTime;
         lastFrameTime += dt;
-        glEnable(GL_DEPTH_TEST);
+
         // Each frame, reset color of each pixel to glClearColor
 
         // @TODO 1 - Clear Depth Buffer Bit as well
-        // ...
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // // Draw textured geometry
@@ -1223,19 +1282,15 @@ int main(int argc, char *argv[])
         // glBindTexture(GL_TEXTURE_2D, cementTextureID);
         glUniform1i(glGetUniformLocation(texturedShaderProgram, "useTexture"), 1);
 
-            // Set view matrix once for both shader programs
-        mat4 viewMatrix = lookAt(cameraPosition, cameraPosition + cameraLookAt, cameraUp);
+        // Set view matrix once for both shader programs
+        // mat4 viewMatrix = lookAt(cameraPosition, cameraPosition + cameraLookAt, cameraUp);
         setViewMatrix(texturedShaderProgram, viewMatrix);
         setViewMatrix(colorShaderProgram, viewMatrix);
 
-
-        
         // Draw light source
-        //glUseProgram(lightShaderProgram);
-        
-      
+        // glUseProgram(lightShaderProgram);
 
-       // Replace the spotlight setup section in your main loop with this:
+        // Replace the spotlight setup section in your main loop with this:
 
         // Calculate orbiting cube positions first (we need these for light positions)
         float orbitRadius2 = 3.5f;
@@ -1243,40 +1298,38 @@ int main(int argc, char *argv[])
 
         // Calculate OrbitingCube1 position
         vec3 orbitingCube1Position = vec3(0.0f, 6.0f, 0.0f) +
-            vec3(cos(radians(spinningCubeAngle)) * orbitRadius2, 0.0f, sin(radians(spinningCubeAngle)) * orbitRadius2);
+                                     vec3(cos(radians(spinningCubeAngle)) * orbitRadius2, 0.0f, sin(radians(spinningCubeAngle)) * orbitRadius2);
 
         // Calculate OrbitingCube2 position (orbits around OrbitingCube1)
         float orbitSpeed2 = 2.0f;
         vec3 orbitingCube2Position = orbitingCube1Position +
-            vec3(cos(radians(spinningCubeAngle * orbitSpeed2)) * orbitRadius2 * 0.4f, 0.0f,
-                sin(radians(spinningCubeAngle * orbitSpeed2)) * orbitRadius2 * 0.4f);
+                                     vec3(cos(radians(spinningCubeAngle * orbitSpeed2)) * orbitRadius2 * 0.4f, 0.0f,
+                                          sin(radians(spinningCubeAngle * orbitSpeed2)) * orbitRadius2 * 0.4f);
 
         // Set up multiple spotlights
         vec3 lightPositions[3] = {
-            vec3(0.0f, 10.0f, 0.0f),           // Main light at center (raised higher)
-            orbitingCube1Position + vec3(0.0f, 2.0f, 0.0f),  // Light above OrbitingCube1
-            orbitingCube2Position + vec3(0.0f, 2.0f, 0.0f)   // Light above OrbitingCube2
+            vec3(0.0f, 10.0f, 0.0f),                        // Main light at center (raised higher)
+            orbitingCube1Position + vec3(0.0f, 2.0f, 0.0f), // Light above OrbitingCube1
+            orbitingCube2Position + vec3(0.0f, 2.0f, 0.0f)  // Light above OrbitingCube2
         };
 
         // Calculate dynamic light directions that follow movement
-        vec3 centerTarget = vec3(0.0f, 0.0f, 0.0f);  // Target point for lights to shine at
+        vec3 centerTarget = vec3(0.0f, 0.0f, 0.0f); // Target point for lights to shine at
 
-      
-
-		 //Downrd facing lights
-         vec3 lightDirections[3] = {
-             vec3(0.0f, -1.0f, 0.0f),          // Main light points down
-             vec3(0.0f, -1.0f, 0.0f),          // OrbitingCube1 light points down
-             vec3(0.0f, -1.0f, 0.0f)           // OrbitingCube2 light points down
-         };
-
-        vec3 lightColors[3] = {
-            vec3(1.0f, 0.0f, 0.0f),           // White light
-            vec3(0.0f, 1.0f, 0.0f),           // Green light for OrbitingCube1
-            vec3(0.0f, 0.0f, 1.0f)            // Blue light for OrbitingCube2
+        // Downrd facing lights
+        vec3 lightDirections[3] = {
+            vec3(0.0f, -1.0f, 0.0f), // Main light points down
+            vec3(0.0f, -1.0f, 0.0f), // OrbitingCube1 light points down
+            vec3(0.0f, -1.0f, 0.0f)  // OrbitingCube2 light points down
         };
 
-        float intensities[3] = { 2.0f, 1.5f, 1.5f };   // Different intensities
+        vec3 lightColors[3] = {
+            vec3(1.0f, 0.0f, 0.0f), // White light
+            vec3(0.0f, 1.0f, 0.0f), // Green light for OrbitingCube1
+            vec3(0.0f, 0.0f, 1.0f)  // Blue light for OrbitingCube2
+        };
+
+        float intensities[3] = {2.0f, 1.5f, 1.5f}; // Different intensities
 
         // Update spotlight uniforms for BOTH shader programs BEFORE drawing
         setMultipleSpotlightUniforms(colorShaderProgram, lightPositions, lightDirections, lightColors, intensities);
@@ -1296,8 +1349,8 @@ int main(int argc, char *argv[])
         glDrawArrays(GL_TRIANGLES, 0, 36); // 6 vertices for the ground, not 36
                                            // 36 vertices, starting at index 0
 
-       // Draw textured geometry
-        glUseProgram(texturedShaderProgram); // Use textured shader program
+        // Draw textured geometry
+        glUseProgram(texturedShaderProgram);                                       // Use textured shader program
         glUniform1i(glGetUniformLocation(texturedShaderProgram, "useTexture"), 1); // Enable texture
 
         // Draw prism
@@ -1313,18 +1366,17 @@ int main(int argc, char *argv[])
         mat4 tetraWorldMatrix = translate(mat4(1.0f), vec3(2.0f, 0.7f, -1.5f)) * scale(mat4(1.0f), vec3(0.7f, 0.7f, 0.7f));
         setWorldMatrix(texturedShaderProgram, tetraWorldMatrix);
         glDrawArrays(GL_TRIANGLES, 0, 12);
-       
+
         // Draw spinning tetra
         mat4 spinTetraWorldMatrix = glm::mat4(1.0);
-        for (int i = 0; i < 4; i++){
+        for (int i = 0; i < 4; i++)
+        {
             glBindVertexArray(texturedVaoTetra);
             glBindTexture(GL_TEXTURE_2D, brickTextureID);
             mat4 spinTetraWorldMatrix = glm::rotate(mat4(1.0f), radians(i * 120.f + 0.5f * spinningCubeAngle), vec3(0.0f, 1.0f, 0.0f)) * translate(mat4(1.0f), vec3(2.8f, 2.0f, 0.f)) * scale(mat4(1.0f), vec3(0.3f, 0.3f, 0.3f));
             setWorldMatrix(texturedShaderProgram, spinTetraWorldMatrix);
             glDrawArrays(GL_TRIANGLES, 0, 12);
-
         }
-        
 
         // Draw pyramid
         glBindVertexArray(texturedPyramidVAO);
@@ -1333,71 +1385,63 @@ int main(int argc, char *argv[])
         setWorldMatrix(texturedShaderProgram, pyramidWorldMatrix);
         glDrawArrays(GL_TRIANGLES, 0, 18);
 
-        glBindTexture(GL_TEXTURE_2D, 0);  // This unbinds any active texture
+        glBindTexture(GL_TEXTURE_2D, 0); // This unbinds any active texture
 
-        
         // Draw colored geometry
-        glUseProgram(colorShaderProgram); // Use color shader program
+        glUseProgram(colorShaderProgram);                                       // Use color shader program
         glUniform1i(glGetUniformLocation(colorShaderProgram, "useTexture"), 0); // Disable texture usage in color shader
-        
 
         // Spinning cube at camera position
-    
 
-
-        // Draw spinning model 
+        // Draw spinning model
         glBindVertexArray(activeVAO);
         GLuint objectColorLocation = glGetUniformLocation(colorShaderProgram, "objectColor");
 
         // Draw center cube (red)
         glUniform3f(objectColorLocation, 1.0f, 0.0f, 0.0f);
         mat4 CentreCube = glm::translate(mat4(1.0f), vec3(0.0f, 6.0f, 0.0f)) *
-            glm::rotate(mat4(1.0f), radians(spinningCubeAngle), vec3(0.0f, 1.0f, 0.0f)) *
-            glm::rotate(mat4(1.0f), radians(-90.0f), vec3(1.0f, 0.0f, 0.0f)) *
-            glm::scale(mat4(1.0f), vec3(0.1f));
+                          glm::rotate(mat4(1.0f), radians(spinningCubeAngle), vec3(0.0f, 1.0f, 0.0f)) *
+                          glm::rotate(mat4(1.0f), radians(-90.0f), vec3(1.0f, 0.0f, 0.0f)) *
+                          glm::scale(mat4(1.0f), vec3(0.1f));
         setWorldMatrix(colorShaderProgram, CentreCube);
         glDrawElements(GL_TRIANGLES, activeVAOVertices, GL_UNSIGNED_INT, 0);
 
         // Draw OrbitingCube1 (Green)
         glUniform3f(objectColorLocation, 0.0f, 1.0f, 0.0f);
         mat4 OrbitingCube1 = glm::translate(mat4(1.0f), orbitingCube1Position) *
-            glm::rotate(mat4(1.0f), radians(spinningCubeAngle), vec3(0.0f, 1.0f, 0.0f)) *
-            glm::rotate(mat4(1.0f), radians(-90.0f), vec3(1.0f, 0.0f, 0.0f)) *
-            glm::scale(mat4(1.0f), vec3(0.07f));
+                             glm::rotate(mat4(1.0f), radians(spinningCubeAngle), vec3(0.0f, 1.0f, 0.0f)) *
+                             glm::rotate(mat4(1.0f), radians(-90.0f), vec3(1.0f, 0.0f, 0.0f)) *
+                             glm::scale(mat4(1.0f), vec3(0.07f));
         setWorldMatrix(colorShaderProgram, OrbitingCube1);
         glDrawElements(GL_TRIANGLES, activeVAOVertices, GL_UNSIGNED_INT, 0);
 
         // Draw OrbitingCube2 (Blue)
         glUniform3f(objectColorLocation, 0.0f, 0.0f, 1.0f);
         mat4 OrbitingCube2 = glm::translate(mat4(1.0f), orbitingCube2Position) *
-            glm::rotate(mat4(1.0f), radians(spinningCubeAngle), vec3(0.0f, 1.0f, 0.0f)) *
-            glm::rotate(mat4(1.0f), radians(-90.0f), vec3(1.0f, 0.0f, 0.0f)) *
-            glm::scale(mat4(1.0f), vec3(0.04f));
+                             glm::rotate(mat4(1.0f), radians(spinningCubeAngle), vec3(0.0f, 1.0f, 0.0f)) *
+                             glm::rotate(mat4(1.0f), radians(-90.0f), vec3(1.0f, 0.0f, 0.0f)) *
+                             glm::scale(mat4(1.0f), vec3(0.04f));
         setWorldMatrix(colorShaderProgram, OrbitingCube2);
         glDrawElements(GL_TRIANGLES, activeVAOVertices, GL_UNSIGNED_INT, 0);
 
         glBindVertexArray(0);
-     
 
+        /*glBindVertexArray(activeVAO);
+         vec3 cubeOrbitCenter = vec3(0.f, 5.f, 0.f);
+         mat4 spinningCubeWorldMatrix =
+             rotate(mat4(1.0f), radians(spinningCubeAngle), vec3(0.0f, 1.0f, 0.0f)) *
+             translate(mat4(1.0f), cubeOrbitCenter);
 
+         glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &spinningCubeWorldMatrix[0][0]);
+         glDrawArrays(GL_TRIANGLES, 0, 36);
+         mat4 spinningCube2WorldMatrix = spinningCubeWorldMatrix * rotate(mat4(1.0f), radians(spinningCubeAngle / 2), vec3(0.0f, 1.0f, 0.0f)) * translate(mat4(1.0f), vec3(3.f, 0.f, 0.f)) * scale(mat4(1.0f), vec3(0.5f, 0.5f, 0.5f));
 
+         glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &spinningCube2WorldMatrix[0][0]);
+         glDrawArrays(GL_TRIANGLES, 0, 36);
+         mat4 spinningCube3WorldMatrix = spinningCube2WorldMatrix * rotate(mat4(1.0f), radians(spinningCubeAngle), vec3(0.0f, 1.0f, 0.0f)) * translate(mat4(1.0f), vec3(3.f, 0.f, 0.f)) * scale(mat4(1.0f), vec3(0.5f, 0.5f, 0.5f));
 
-       /*glBindVertexArray(activeVAO);
-        vec3 cubeOrbitCenter = vec3(0.f, 5.f, 0.f);
-        mat4 spinningCubeWorldMatrix =
-            rotate(mat4(1.0f), radians(spinningCubeAngle), vec3(0.0f, 1.0f, 0.0f)) *
-            translate(mat4(1.0f), cubeOrbitCenter);
-
-        glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &spinningCubeWorldMatrix[0][0]);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
-        mat4 spinningCube2WorldMatrix = spinningCubeWorldMatrix * rotate(mat4(1.0f), radians(spinningCubeAngle / 2), vec3(0.0f, 1.0f, 0.0f)) * translate(mat4(1.0f), vec3(3.f, 0.f, 0.f)) * scale(mat4(1.0f), vec3(0.5f, 0.5f, 0.5f));
-
-        glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &spinningCube2WorldMatrix[0][0]);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
-        mat4 spinningCube3WorldMatrix = spinningCube2WorldMatrix * rotate(mat4(1.0f), radians(spinningCubeAngle), vec3(0.0f, 1.0f, 0.0f)) * translate(mat4(1.0f), vec3(3.f, 0.f, 0.f)) * scale(mat4(1.0f), vec3(0.5f, 0.5f, 0.5f));
-
-        glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &spinningCube3WorldMatrix[0][0]);
-        glDrawArrays(GL_TRIANGLES, 0, 36);*/
+         glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &spinningCube3WorldMatrix[0][0]);
+         glDrawArrays(GL_TRIANGLES, 0, 36);*/
 
         // End Frame
         glfwSwapBuffers(window);
