@@ -20,6 +20,11 @@
 #include "OBJloader.h"   //For loading .obj files
 #include "OBJloaderV2.h" //For loading .obj files using a polygon list format
 
+// Assimp headers
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
+
 using namespace glm;
 using namespace std;
 
@@ -38,9 +43,6 @@ public:
 
     void Draw()
     {
-        // this is a bit of a shortcut, since we have a single vbo, it is already bound
-        // let's just set the world matrix in the vertex shader
-
         mat4 worldMatrix = translate(mat4(1.0f), mPosition) * rotate(mat4(1.0f), radians(180.0f), vec3(0.0f, 1.0f, 0.0f)) * scale(mat4(1.0f), vec3(0.2f, 0.2f, 0.2f));
         glUniformMatrix4fv(mWorldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
         glDrawArrays(GL_TRIANGLES, 0, 36);
@@ -108,99 +110,6 @@ GLuint loadTexture(const char *filename)
     glBindTexture(GL_TEXTURE_2D, 0);
     return textureID;
 }
-
-// const char *getVertexShaderSource()
-//{
-//     // For now, you use a string for your shader code, in the assignment, shaders will be stored in .glsl files
-//     return "#version 330 core\n"
-//            "layout (location = 0) in vec3 aPos;"
-//            "layout (location = 1) in vec3 aColor;"
-//            "layout (location = 2) in vec2 aUV;"
-//             ""
-//             "out vec3 vertexNormal;"
-//             ""
-//            "uniform mat4 worldMatrix;"
-//            "uniform mat4 viewMatrix = mat4(1.0);" // default value for view matrix (identity)
-//            "uniform mat4 projectionMatrix = mat4(1.0);"
-//            ""
-//            "out vec3 vertexColor;"
-//            "out vec2 vertexUV;"
-//            ""
-//            "void main()"
-//            "{"
-//            "   vertexColor = aColor;"
-//            "   mat4 modelViewProjection = projectionMatrix * viewMatrix * worldMatrix;"
-//            "   gl_Position = modelViewProjection * vec4(aPos.x, aPos.y, aPos.z, 1.0);"
-//            "   vertexUV = aUV;"
-//             "    vertexNormal = mat3(transpose(inverse(worldMatrix))) * aNormal;\n"
-//            "}";
-// }
-//
-// const char *getFragmentShaderSource()
-//{
-//     return "#version 330 core\n"
-//            "in vec3 vertexColor;"
-//            "in vec2 vertexUV;"
-//            "uniform sampler2D textureSampler;"
-//            ""
-//            "out vec4 FragColor;"
-//            "void main()"
-//            "{"
-//         "    vec3 color = normalize(vertexNormal) * 0.5 + 0.5;\n"  // map from [-1,1] to [0,1]
-//            "   vec4 textureColor = texture(textureSampler, vertexUV);"
-//            "   FragColor = textureColor;"
-//            "}";
-// }
-
-// const char* getVertexShaderSource()
-//{
-//     return "#version 330 core\n"
-//         "layout (location = 0) in vec3 aPos;\n"
-//         "layout (location = 1) in vec3 aNormal;\n"
-//         "layout (location = 2) in vec2 aUV;\n"
-//
-//
-//         "\n"
-//         "out vec3 vertexNormal;\n"
-//         "out vec2 vertexUV;\n"
-//         "\n"
-//         "uniform mat4 worldMatrix;\n"
-//         "uniform mat4 viewMatrix;\n"
-//         "uniform mat4 projectionMatrix;\n"
-//         "\n"
-//         "void main()\n"
-//         "{\n"
-//         "   vertexUV = aUV;\n"
-//         "   vertexNormal = mat3(transpose(inverse(worldMatrix))) * aNormal;\n"
-//         "   mat4 modelViewProjection = projectionMatrix * viewMatrix * worldMatrix;\n"
-//         "   gl_Position = modelViewProjection * vec4(aPos, 1.0);\n"
-//         "}";
-// }
-
-// const char* getFragmentShaderSource()
-//{
-//     return "#version 330 core\n"
-//         "in vec3 vertexColor;\n"
-//         "in vec2 vertexUV;\n"
-//         "in vec3 vertexNormal;\n"
-//         "uniform sampler2D textureSampler;\n"
-//         "uniform bool useTexture;\n"
-//         "uniform vec3 objectColor;\n"
-//         "\n"
-//         "out vec4 FragColor;\n"
-//         "void main()\n"
-//         "{\n"
-//         "   if (useTexture) {\n"
-//         "       vec4 textureColor = texture(textureSampler, vertexUV);\n"
-//         "       FragColor = textureColor;\n"
-//         "   } else {\n"
-//         "       float beam = sin(vertexUV.x * 10.0);\n"
-//         "       beam = beam * 0.5 + 0.5;\n"
-//         "       FragColor = vec4(objectColor * beam, 1.0);\n"
-//         "   }\n"
-//         "}";
-// }
-
 const char *getVertexShaderSource()
 {
     return "#version 330 core\n"
@@ -226,66 +135,6 @@ const char *getVertexShaderSource()
            "   gl_Position = modelViewProjection * vec4(aPos, 1.0);\n"
            "}";
 }
-// WORKING SPOTLIGHT
-// const char* getFragmentShaderSource()
-//{
-//     return "#version 330 core\n"
-//         "in vec3 vertexColor;\n"
-//         "in vec2 vertexUV;\n"
-//         "in vec3 vertexNormal;\n"
-//         "in vec3 worldPos;\n"  // Added for spotlight calculations
-//
-//         "uniform sampler2D textureSampler;\n"
-//         "uniform bool useTexture;\n"
-//         "uniform vec3 objectColor;\n"
-//
-//         // Spotlight uniforms
-//         "uniform vec3 spotlightPos;\n"
-//         "uniform vec3 spotlightDir;\n"
-//         "uniform float spotlightCutoff;\n"
-//         "uniform float spotlightOuterCutoff;\n"
-//         "uniform vec3 spotlightColor;\n"
-//         "uniform float spotlightIntensity;\n"
-//
-//         "\n"
-//         "out vec4 FragColor;\n"
-//
-//         "float calculateSpotlight(vec3 lightPos, vec3 lightDir, float cutoff, float outerCutoff, vec3 fragPos)\n"
-//         "{\n"
-//         "    vec3 lightToFrag = normalize(fragPos - lightPos);\n"
-//         "    float theta = dot(lightToFrag, normalize(lightDir));\n"
-//         "    float epsilon = cutoff - outerCutoff;\n"
-//         "    float intensity = clamp((theta - outerCutoff) / epsilon, 0.0, 1.0);\n"
-//         "    return intensity;\n"
-//         "}\n"
-//
-//         "void main()\n"
-//         "{\n"
-//         "   // Calculate spotlight intensity\n"
-//         "   float spotIntensity = calculateSpotlight(spotlightPos, spotlightDir, spotlightCutoff, spotlightOuterCutoff, worldPos);\n"
-//         "   \n"
-//         "   // Calculate basic lighting (optional - adds nice depth)\n"
-//         "   vec3 normal = normalize(vertexNormal);\n"
-//         "   vec3 lightDirection = normalize(spotlightPos - worldPos);\n"
-//         "   float diffuse = max(dot(normal, lightDirection), 0.0);\n"
-//         "   \n"
-//         "   // Combine spotlight with diffuse lighting\n"
-//         "   float lightFactor = spotIntensity * diffuse * spotlightIntensity;\n"
-//         "   vec3 lightContribution = spotlightColor * lightFactor;\n"
-//         "   \n"
-//         "   if (useTexture) {\n"
-//         "       vec4 textureColor = texture(textureSampler, vertexUV);\n"
-//         "       // Apply spotlight to texture (keeping original 0.2 base + spotlight)\n"
-//         "       FragColor = textureColor * (0.4 + lightContribution.r);\n"
-//         "   } else {\n"
-//         "       float beam = sin(vertexUV.x * 10.0);\n"
-//         "       beam = beam * 0.5 + 0.5;\n"
-//         "       // Apply spotlight to procedural color (keeping original beam effect)\n"
-//         "       vec3 finalColor = objectColor * beam * (0.5 + lightContribution);\n"
-//         "       FragColor = vec4(finalColor, 1.0)*1.5;\n"
-//         "   }\n"
-//         "}";
-// }
 
 const char *getFragmentShaderSource()
 {
@@ -432,63 +281,6 @@ GLuint compileAndLinkShaders(const char *vertexShaderSource, const char *fragmen
     return programID;
 }
 
-// int compileAndLinkShaders(const char *vertexShaderSource, const char *fragmentShaderSource)
-// {
-//     // compile and link shader program
-//     // return shader program id
-//     // ------------------------------------
-
-//     // vertex shader
-//     int vertexShader = glCreateShader(GL_VERTEX_SHADER);
-//     glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-//     glCompileShader(vertexShader);
-
-//     // check for shader compile errors
-//     int success;
-//     char infoLog[512];
-//     glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-//     if (!success)
-//     {
-//         glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-//         std::cerr << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n"
-//                   << infoLog << std::endl;
-//     }
-
-//     // fragment shader
-//     int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-//     glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-//     glCompileShader(fragmentShader);
-
-//     // check for shader compile errors
-//     glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
-//     if (!success)
-//     {
-//         glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-//         std::cerr << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n"
-//                   << infoLog << std::endl;
-//     }
-
-//     // link shaders
-//     int shaderProgram = glCreateProgram();
-//     glAttachShader(shaderProgram, vertexShader);
-//     glAttachShader(shaderProgram, fragmentShader);
-//     glLinkProgram(shaderProgram);
-
-//     // check for linking errors
-//     glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-//     if (!success)
-//     {
-//         glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
-//         std::cerr << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n"
-//                   << infoLog << std::endl;
-//     }
-
-//     glDeleteShader(vertexShader);
-//     glDeleteShader(fragmentShader);
-
-//     return shaderProgram;
-// }
-
 void setProjectionMatrix(int shaderProgram, mat4 projectionMatrix)
 {
     glUseProgram(shaderProgram);
@@ -573,6 +365,106 @@ struct TexturedColoredVertex
     vec3 normal;
     vec2 uv;
 };
+
+// New structs to handle multiple meshes
+struct Mesh
+{
+    GLuint VAO;
+    int vertexCount;
+    string name; // Add a name to identify the mesh
+};
+
+struct Model
+{
+    std::vector<Mesh> meshes;
+};
+
+// A new function to load a model using Assimp
+Model setupFBXModel(const std::string &path)
+{
+    Model model;
+    Assimp::Importer importer;
+    const aiScene *scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
+
+    if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
+    {
+        std::cerr << "Assimp error: " << importer.GetErrorString() << std::endl;
+        return model;
+    }
+
+    // std::cout << "Loading model from: " << path << std::endl;
+    // std::cout << "Assimp found " << scene->mNumMeshes << " meshes." << std::endl;
+
+    for (unsigned int i = 0; i < scene->mNumMeshes; i++)
+    {
+        aiMesh *mesh = scene->mMeshes[i];
+
+        // std::cout << "Processing mesh " << i << " with " << mesh->mNumVertices << " vertices and " << mesh->mNumFaces << " faces." << std::endl;
+
+        std::vector<glm::vec3> vertices;
+        std::vector<glm::vec3> normals;
+        std::vector<glm::vec2> uvs;
+        std::vector<int> indices;
+
+        for (unsigned int j = 0; j < mesh->mNumVertices; j++)
+        {
+            vertices.push_back(glm::vec3(mesh->mVertices[j].x, mesh->mVertices[j].y, mesh->mVertices[j].z));
+            if (mesh->HasNormals())
+            {
+                normals.push_back(glm::vec3(mesh->mNormals[j].x, mesh->mNormals[j].y, mesh->mNormals[j].z));
+            }
+            if (mesh->HasTextureCoords(0))
+            {
+                uvs.push_back(glm::vec2(mesh->mTextureCoords[0][j].x, mesh->mTextureCoords[0][j].y));
+            }
+        }
+
+        for (unsigned int j = 0; j < mesh->mNumFaces; j++)
+        {
+            aiFace face = mesh->mFaces[j];
+            for (unsigned int k = 0; k < face.mNumIndices; k++)
+            {
+                indices.push_back(face.mIndices[k]);
+            }
+        }
+
+        GLuint VAO;
+        glGenVertexArrays(1, &VAO);
+        glBindVertexArray(VAO);
+
+        GLuint vertices_VBO;
+        glGenBuffers(1, &vertices_VBO);
+        glBindBuffer(GL_ARRAY_BUFFER, vertices_VBO);
+        glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3), &vertices.front(), GL_STATIC_DRAW);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid *)0);
+        glEnableVertexAttribArray(0);
+
+        GLuint normals_VBO;
+        glGenBuffers(1, &normals_VBO);
+        glBindBuffer(GL_ARRAY_BUFFER, normals_VBO);
+        glBufferData(GL_ARRAY_BUFFER, normals.size() * sizeof(glm::vec3), &normals.front(), GL_STATIC_DRAW);
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid *)0);
+        glEnableVertexAttribArray(1);
+
+        GLuint uvs_VBO;
+        glGenBuffers(1, &uvs_VBO);
+        glBindBuffer(GL_ARRAY_BUFFER, uvs_VBO);
+        glBufferData(GL_ARRAY_BUFFER, uvs.size() * sizeof(glm::vec2), &uvs.front(), GL_STATIC_DRAW);
+        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), (GLvoid *)0);
+        glEnableVertexAttribArray(2);
+
+        GLuint EBO;
+        glGenBuffers(1, &EBO);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(int), &indices.front(), GL_STATIC_DRAW);
+
+        glBindVertexArray(0);
+        model.meshes.push_back({VAO, (int)indices.size(), mesh->mName.C_Str()});
+        // std::cout << "Successfully loaded mesh " << i << " with name '" << mesh->mName.C_Str() << "'. Vertex count: " << indices.size() << std::endl;
+    }
+
+    return model;
+}
 
 GLuint setupModelVBO(string path, int &vertexCount)
 {
@@ -877,136 +769,6 @@ vec3 prism1VertexArray[] = {                           // position,             
     vec3(0.5f, 0.5f, 0.5f), vec3(0.5f, 0.5f, 0.5f),
     vec3(-0.5f, 0.5f, -0.5f), vec3(0.5f, 0.5f, 0.5f),
     vec3(-0.5f, 0.5f, 0.5f), vec3(0.5f, 0.5f, 0.5f)};
-vec3 prism2VertexArray[] = {                           // position,                            color
-    vec3(-0.5f, -0.5f, -0.5f), vec3(1.0f, 0.0f, 0.0f), // left - red
-    vec3(-0.5f, -0.5f, 0.5f), vec3(1.0f, 0.0f, 0.0f),
-    vec3(-0.5f, 1.5f, 0.5f), vec3(1.0f, 0.0f, 0.0f),
-
-    vec3(-0.5f, -0.5f, -0.5f), vec3(1.0f, 0.0f, 0.0f),
-    vec3(-0.5f, 1.5f, 0.5f), vec3(1.0f, 0.0f, 0.0f),
-    vec3(-0.5f, 1.5f, -0.5f), vec3(1.0f, 0.0f, 0.0f),
-
-    vec3(0.5f, 1.5f, -0.5f), vec3(0.0f, 0.0f, 1.0f), // far - blue
-    vec3(-0.5f, -0.5f, -0.5f), vec3(0.0f, 0.0f, 1.0f),
-    vec3(-0.5f, 1.5f, -0.5f), vec3(0.0f, 0.0f, 1.0f),
-
-    vec3(0.5f, 1.5f, -0.5f), vec3(0.0f, 0.0f, 1.0f),
-    vec3(0.5f, -0.5f, -0.5f), vec3(0.0f, 0.0f, 1.0f),
-    vec3(-0.5f, -0.5f, -0.5f), vec3(0.0f, 0.0f, 1.0f),
-
-    vec3(0.5f, -0.5f, 0.5f), vec3(0.0f, 1.0f, 1.0f), // bottom - turquoise
-    vec3(-0.5f, -0.5f, -0.5f), vec3(0.0f, 1.0f, 1.0f),
-    vec3(0.5f, -0.5f, -0.5f), vec3(0.0f, 1.0f, 1.0f),
-
-    vec3(0.5f, -0.5f, 0.5f), vec3(0.0f, 1.0f, 1.0f),
-    vec3(-0.5f, -0.5f, 0.5f), vec3(0.0f, 1.0f, 1.0f),
-    vec3(-0.5f, -0.5f, -0.5f), vec3(0.0f, 1.0f, 1.0f),
-
-    vec3(-0.5f, 1.5f, 0.5f), vec3(0.0f, 1.0f, 0.0f), // near - green
-    vec3(-0.5f, -0.5f, 0.5f), vec3(0.0f, 1.0f, 0.0f),
-    vec3(0.5f, -0.5f, 0.5f), vec3(0.0f, 1.0f, 0.0f),
-
-    vec3(0.5f, 1.5f, 0.5f), vec3(0.0f, 1.0f, 0.0f),
-    vec3(-0.5f, 1.5f, 0.5f), vec3(0.0f, 1.0f, 0.0f),
-    vec3(0.5f, -0.5f, 0.5f), vec3(0.0f, 1.0f, 0.0f),
-
-    vec3(0.5f, 1.5f, 0.5f), vec3(1.0f, 0.0f, 1.0f), // right - purple
-    vec3(0.5f, -0.5f, -0.5f), vec3(1.0f, 0.0f, 1.0f),
-    vec3(0.5f, 1.5f, -0.5f), vec3(1.0f, 0.0f, 1.0f),
-
-    vec3(0.5f, -0.5f, -0.5f), vec3(1.0f, 0.0f, 1.0f),
-    vec3(0.5f, 1.5f, 0.5f), vec3(1.0f, 0.0f, 1.0f),
-    vec3(0.5f, -0.5f, 0.5f), vec3(1.0f, 0.0f, 1.0f),
-
-    vec3(0.5f, 1.5f, 0.5f), vec3(0.5f, 0.5f, 0.5f), // top - gray
-    vec3(0.5f, 1.5f, -0.5f), vec3(0.5f, 0.5f, 0.5f),
-    vec3(-0.5f, 1.5f, -0.5f), vec3(0.5f, 0.5f, 0.5f),
-
-    vec3(0.5f, 1.5f, 0.5f), vec3(0.5f, 0.5f, 0.5f),
-    vec3(-0.5f, 1.5f, -0.5f), vec3(0.5f, 0.5f, 0.5f),
-    vec3(-0.5f, 1.5f, 0.5f), vec3(0.5f, 0.5f, 0.5f)};
-
-glm::vec3 pyramidVertexArray[] = {
-    // left face
-    {-0.5f, -0.5f, -0.5f},
-    {1, 0, 0},
-    {-0.5f, -0.5f, 0.5f},
-    {1, 0, 0},
-    {0.0f, 1.5f, 0.0f},
-    {1, 0, 0},
-
-    // back face
-    {0.5f, -0.5f, -0.5f},
-    {0, 0, 1},
-    {-0.5f, -0.5f, -0.5f},
-    {0, 0, 1},
-    {0.0f, 1.5f, 0.0f},
-    {0, 0, 1},
-
-    // right face
-    {0.5f, -0.5f, 0.5f},
-    {1, 0, 1},
-    {0.5f, -0.5f, -0.5f},
-    {1, 0, 1},
-    {0.0f, 1.5f, 0.0f},
-    {1, 0, 1},
-
-    // front face
-    {-0.5f, -0.5f, 0.5f},
-    {0, 1, 0},
-    {0.5f, -0.5f, 0.5f},
-    {0, 1, 0},
-    {0.0f, 1.5f, 0.0f},
-    {0, 1, 0},
-
-    {-0.5f, -0.5f, -0.5f},
-    {0, 1, 1},
-    {0.5f, -0.5f, -0.5f},
-    {0, 1, 1},
-    {0.5f, -0.5f, 0.5f},
-    {0, 1, 1},
-
-    {-0.5f, -0.5f, -0.5f},
-    {0, 1, 1},
-    {0.5f, -0.5f, 0.5f},
-    {0, 1, 1},
-    {-0.5f, -0.5f, 0.5f},
-    {0, 1, 1},
-};
-
-glm::vec3 tetraVertexArray[] = {
-    // face red
-    {1.f, 1.f, 1.f},
-    {1.f, 0.f, 0.f},
-    {1.f, -1.f, -1.f},
-    {1.f, 0.f, 0.f},
-    {-1.f, 1.f, -1.f},
-    {1.f, 0.f, 0.f},
-
-    // face green
-    {1.f, 1.f, 1.f},
-    {0.f, 1.f, 0.f},
-    {-1.f, -1.f, 1.f},
-    {0.f, 1.f, 0.f},
-    {1.f, -1.f, -1.f},
-    {0.f, 1.f, 0.f},
-
-    // face blue
-    {1.f, 1.f, 1.f},
-    {0.f, 0.f, 1.f},
-    {-1.f, 1.f, -1.f},
-    {0.f, 0.f, 1.f},
-    {-1.f, -1.f, 1.f},
-    {0.f, 0.f, 1.f},
-
-    // face yellow
-    {1.f, -1.f, -1.f},
-    {1.f, 1.f, 0.f},
-    {-1.f, -1.f, 1.f},
-    {1.f, 1.f, 0.f},
-    {-1.f, 1.f, -1.f},
-    {1.f, 1.f, 0.f},
-};
 
 int createTexturedVertexArrayObject(const TexturedColoredVertex *vertexArray, int arraySize)
 {
@@ -1047,6 +809,14 @@ int createTexturedVertexArrayObject(const TexturedColoredVertex *vertexArray, in
 
     return vertexArrayObject;
 }
+
+class Light
+{
+public:
+    vec3 position;
+
+    Light(vec3 pos) : position(pos) {}
+};
 
 GLfloat lightVertices[] = {
     -0.1f, -0.1f, 0.1f,
@@ -1108,14 +878,6 @@ int createVertexArrayObject(const glm::vec3 *vertexArray, int arraySize)
     return vertexArrayObject;
 }
 
-class Light
-{
-public:
-    vec3 position;
-
-    Light(vec3 pos) : position(pos) {}
-};
-
 int main(int argc, char *argv[])
 {
 
@@ -1160,6 +922,7 @@ int main(int argc, char *argv[])
     GLuint graniteTextureID = loadTexture("Textures/granite.jpg");
     GLuint sandTextureID = loadTexture("Textures/soilsand.jpg");
     GLuint woodTextureID = loadTexture("Textures/wood.jpg");
+    GLuint planeTextureID = loadTexture("Textures/plane.png");
 
     // Black background
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -1171,6 +934,13 @@ int main(int argc, char *argv[])
     int texturedShaderProgram = compileAndLinkShaders(getTexturedVertexShaderSource(), getTexturedFragmentShaderSource());
 
     // int lightShaderProgram = compileAndLinkShaders(getLightVertexShaderSource(), getLightFragmentShaderSource());
+
+    // Plane model setup
+    string planePath = "Models/plane.fbx";
+    Model planeModel = setupFBXModel(planePath);
+
+    // Use a pointer to the active model
+    const Model *activeModel = &planeModel;
 
     // Setup models
     string cubePath = "Models/cube.obj";
@@ -1274,12 +1044,6 @@ int main(int argc, char *argv[])
         // @TODO 1 - Clear Depth Buffer Bit as well
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        // // Draw textured geometry
-        // glUseProgram(texturedShaderProgram);
-
-        // glActiveTexture(GL_TEXTURE0);
-        // GLuint textureLocation = glGetUniformLocation(texturedShaderProgram, "textureSampler");
-        // glBindTexture(GL_TEXTURE_2D, cementTextureID);
         glUniform1i(glGetUniformLocation(texturedShaderProgram, "useTexture"), 1);
 
         // Set view matrix once for both shader programs
@@ -1384,6 +1148,97 @@ int main(int argc, char *argv[])
         mat4 pyramidWorldMatrix = translate(mat4(1.0f), vec3(-2.0f, 0.5f, -1.f)) * scale(mat4(1.0f), vec3(1.0f, 1.0f, 1.0f));
         setWorldMatrix(texturedShaderProgram, pyramidWorldMatrix);
         glDrawArrays(GL_TRIANGLES, 0, 18);
+
+        // Draw the plane model
+        float currentTime = glfwGetTime();
+        float propellerAngle = fmod(currentTime * 1080.0f, 360.0f);
+
+        // Circular motion animation for the entire plane
+        float circularMotionAngle = fmod(currentTime * 45.0f, 360.0f);
+
+        if (activeModel)
+        {
+            vec3 planePosition = vec3(0.0f, 4.0f, 0.0f);
+            mat4 planeOrientationMatrix = mat4(1.0f);
+
+            // mat4 baseModelMatrix = glm::translate(mat4(1.0f), planePosition) *
+            //                        planeOrientationMatrix *
+            //                        glm::scale(mat4(1.0f), vec3(0.5f));
+            mat4 baseModelMatrix = glm::rotate(mat4(1.0f),
+                                               glm::radians(circularMotionAngle),
+                                               vec3(0.0f, 1.0f, 0.0f)) *
+                                   glm::translate(mat4(1.0f),
+                                                  vec3(5.0f, 4.5f, 0.0f)) * // plane position
+                                   glm::rotate(mat4(1.0f),
+                                               glm::radians(180.0f),
+                                               vec3(0.0f, 1.0f, 0.0f)) * // This is the Y-axis rotation
+                                   glm::rotate(mat4(1.0f),
+                                               glm::radians(0.0f),
+                                               vec3(1.0f, 0.0f, 0.0f)) *
+                                   glm::scale(mat4(1.0f),
+                                              vec3(0.5f));
+
+            glBindTexture(GL_TEXTURE_2D, planeTextureID);
+
+            for (const auto &mesh : activeModel->meshes)
+            {
+                mat4 finalWorldMatrix = baseModelMatrix;
+
+                if (mesh.name == "Propeller.001")
+                {
+                    finalWorldMatrix = finalWorldMatrix * glm::translate(mat4(1.0f), vec3(0.0f, -0.25f, 2.0f)) * glm::rotate(mat4(1.0f), radians(propellerAngle), vec3(0.0f, 0.0f, 1.0f));
+                }
+
+                if (mesh.name == "Cylinder.001")
+                {
+                    // cockpit
+                    finalWorldMatrix = finalWorldMatrix * glm::translate(mat4(1.0f), vec3(0.0f, 0.5f, -1.2f)) * glm::scale(mat4(1.0f), vec3(1.5f, 1.0f, 1.0f));
+                }
+
+                setWorldMatrix(texturedShaderProgram, finalWorldMatrix);
+                glBindVertexArray(mesh.VAO);
+                glDrawElements(GL_TRIANGLES, mesh.vertexCount, GL_UNSIGNED_INT, 0);
+            }
+
+            // new angle for the second plane, behind the first
+            float secondPlaneAngle = glm::radians(circularMotionAngle - 180.0f);
+
+            // Create a separate base model matrix for the second plane
+            mat4 baseModelMatrix2 = glm::rotate(mat4(1.0f),
+                                                secondPlaneAngle,
+                                                vec3(0.0f, 1.0f, 0.0f)) *
+                                    glm::translate(mat4(1.0f),
+                                                   vec3(5.0f, 4.5f, 0.0f)) *
+                                    glm::rotate(mat4(1.0f),
+                                                glm::radians(180.0f),
+                                                vec3(0.0f, 1.0f, 0.0f)) *
+                                    glm::rotate(mat4(1.0f),
+                                                glm::radians(0.0f),
+                                                vec3(1.0f, 0.0f, 0.0f)) *
+                                    glm::scale(mat4(1.0f),
+                                               vec3(0.5f));
+
+            // loop through the meshes again to draw the second plane
+            for (const auto &mesh : activeModel->meshes)
+            {
+                mat4 finalWorldMatrix = baseModelMatrix2;
+
+                if (mesh.name == "Propeller.001")
+                {
+                    finalWorldMatrix = finalWorldMatrix * glm::translate(mat4(1.0f), vec3(0.0f, -0.25f, 2.0f)) * glm::rotate(mat4(1.0f), radians(propellerAngle), vec3(0.0f, 0.0f, 1.0f));
+                }
+
+                if (mesh.name == "Cylinder.001")
+                {
+                    finalWorldMatrix = finalWorldMatrix * glm::translate(mat4(1.0f), vec3(0.0f, 0.5f, -1.2f)) * glm::scale(mat4(1.0f), vec3(1.5f, 1.0f, 1.0f));
+                }
+
+                setWorldMatrix(texturedShaderProgram, finalWorldMatrix);
+                glBindVertexArray(mesh.VAO);
+                glDrawElements(GL_TRIANGLES, mesh.vertexCount, GL_UNSIGNED_INT, 0);
+            }
+            glBindTexture(GL_TEXTURE_2D, 0);
+        }
 
         glBindTexture(GL_TEXTURE_2D, 0); // This unbinds any active texture
 
